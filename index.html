@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Para Dulce — Una dedicatoria</title>
+  <style>
+    /* --- Variables Base --- */
+    :root {
+      --bg: #10081a;
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --card-border: rgba(255, 255, 255, 0.05);
+      --accent: #ff5678; /* Color principal */
+      --accent-2: #ff9bb3; /* Color secundario */
+      --accent-rgb: 255, 86, 120;
+      --text: #e6eef8;
+      --glass: rgba(255, 255, 255, 0.05);
+      --transition: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* --- Tema Alternativo (Estilo "Mi") --- */
+    body.theme-mi {
+      --bg: #071027;
+      --accent: #6ee7b7;
+      --accent-2: #60a5fa;
+      --accent-rgb: 110, 231, 183;
+    }
+
+    /* --- Estilos Generales --- */
+    * { box-sizing: border-box; }
+    
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 10% 10%, rgba(var(--accent-rgb), 0.15), transparent 60%), var(--bg);
+      background-color: var(--bg);
+      color: var(--text);
+      transition: background 0.8s ease, color 0.8s ease;
+      overflow-x: hidden; /* Evita scroll horizontal por las animaciones */
+    }
+
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+    }
+
+    /* --- Card Principal --- */
+    .card {
+      width: 100%;
+      max-width: 800px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(12px);
+      position: relative;
+      z-index: 10; /* Por encima de las animaciones */
+      animation: floatCard 4s ease-in-out infinite;
+    }
+
+    @keyframes floatCard {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    /* --- Cabecera --- */
+    header {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 24px;
+      margin-bottom: 24px;
+    }
+
+    .logo {
+      width: 70px;
+      height: 70px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      font-size: 32px;
+      box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.25);
+      transition: var(--transition);
+    }
+
+    .header-text h1 { margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.5px;}
+    .header-text p.lead { margin: 6px 0 0 0; opacity: 0.8; font-size: 15px; }
+
+    .controls { margin-left: auto; display: flex; gap: 12px; }
+    
+    .btn {
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .btn:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
+    
+    .btn.playing {
+      border-color: var(--accent);
+      box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.2);
+    }
+
+    /* --- Contenido de la Carta --- */
+    .content { display: flex; justify-content: center; }
+    .letter { max-width: 600px; }
+
+    .card-quote {
+      font-size: 19px;
+      line-height: 1.6;
+      font-weight: 300;
+      color: var(--accent-2);
+      border-left: 3px solid var(--accent);
+      padding-left: 16px;
+      margin-bottom: 32px;
+      transition: color 0.8s ease, border-color 0.8s ease;
+    }
+
+    .letter-body {
+      font-style: italic;
+      line-height: 1.8;
+      font-size: 17px;
+      opacity: 0.9;
+    }
+
+    /* --- Animaciones de Fondo --- */
+    .hearts-container {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+        /* z-index bajo para que esté detrás de la carta */
+    }
+
+    /* Pequeños corazones que suben */
+    .heart-small {
+        position: absolute;
+        bottom: -50px;
+        opacity: 0;
+        z-index: 1;
+    }
+
+    /* NUEVO: Corazón Burbuja Gigante */
+    .big-bubble-heart {
+        position: absolute;
+        top: 50%;
+        left: -300px; /* Empieza fuera de pantalla */
+        opacity: 0.12; /* Muy sutil y transparente */
+        filter: blur(12px); /* Efecto burbuja desenfocada */
+        z-index: 0; /* Detrás de los pequeños */
+        will-change: transform;
+    }
+    
+    .hearts-container svg { width: 100%; height: 100%; display: block; }
+
+
+    /* --- Pantalla de Entrada (Overlay) --- */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 8, 20, 0.85);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+    
+    .overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .entrance {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 450px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    }
+
+    .entrance h2 { margin: 0 0 16px 0; font-size: 28px; }
+    .entrance p { opacity: 0.8; line-height: 1.5; margin-bottom: 24px; }
+    
+    .enter-btn {
+      padding: 14px 28px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(var(--accent-rgb), 0.3);
+      transition: var(--transition);
+    }
+    .enter-btn:hover { transform: scale(1.05); box-shadow: 0 16px 32px rgba(var(--accent-rgb), 0.4); }
+
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 40px;
+      font-size: 14px;
+      opacity: 0.6;
+    }
+
+    /* Audio oculto */
+    #audio { display: none; }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .controls { margin-left: 0; width: 100%; justify-content: flex-start; }
+      .card { padding: 24px; }
+      .entrance { padding: 24px; margin: 16px; }
+      .header-text h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hearts-container" id="heartsContainer"></div>
+
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <div class="logo">D</div>
+        <div class="header-text">
+          <h1>Una dedicatoria para Dulce uwu</h1>
+          <p class="lead">Un rincón especial pensado solo para ti</p>
+        </div>
+        <div class="controls">
+          <button class="btn" id="toggleThemeBtn">✨ Cambiar estilo</button>
+          <button class="btn" id="playPauseBtn">▶️ Reproducir</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="letter">
+          <div class="card-quote">
+            "Mailov,mi cuchurrumin,mi aztekita,mi marroncita,la q le gusta la PALTA uwu."
+          </div>
+
+          <div class="letter-body">
+            <p>Que bonito es tenerte en mi vida :3,eres alguien que a pesar de las diversidades sigue de pie y eso me gusta uwu, me gusta que tengamos casi las mismas vibras jsjjsdsj
+            
+            </p>
+            <p>Esto lo hice con cariño para ti uwu,hasta ahora no conoci a nadie como tu :3,te kello y te ano mucho nwn.</p>
+            <p style="margin-top: 24px; font-weight: 600;">— Con todo mi cariño,yo jjdadsj ugu 💗</p>
+          </div>
+          
+          <audio id="audio" loop>
+            <source src="catspedup.mp3" type="audio/mpeg" />
+          </audio>
+        </div>
+      </div>
+
+      <footer>Hecho con cariño y sentimiento ✨</footer>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="entrance">
+      <h2>Para  💌</h2>
+      <p>Esta es una carta digital. Pulsa entrar, ajusta el volumen y deja que la magia haga el resto.</p>
+      <button class="enter-btn" id="enterBtn">Leer la carta</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Elementos del DOM ---
+    const audio = document.getElementById('audio');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const overlay = document.getElementById('overlay');
+    const enterBtn = document.getElementById('enterBtn');
+    const toggleThemeBtn = document.getElementById('toggleThemeBtn');
+    const heartsContainer = document.getElementById('heartsContainer');
+    
+    let smallHeartInterval;
+    let movingRight = true; // Controla la dirección de la burbuja gigante
+
+    // --- SVG del Corazón (Reutilizable) ---
+    const heartSVG = `<svg viewBox="0 0 24 24" fill="var(--accent)" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-7.5-4.6-9.5-7.2C.6 11.4 3.3 5 8.6 6.5 10.1 7 12 8.4 12 8.4s1.9-1.4 3.4-1.9c5.3-1.5 8 5 5.1 7.3C19.5 16.4 12 21 12 21z"/></svg>`;
+
+    // --- Inicialización ---
+    const savedTheme = localStorage.getItem('ded_theme') || 'valentine';
+    applyTheme(savedTheme);
+
+    // --- Controles de Audio ---
+    function toggleAudio() {
+      if (audio.paused) {
+        // Promesa para manejar políticas de autoplay de navegadores
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(_ => {
+                playPauseBtn.innerHTML = '⏸ Pausar';
+                playPauseBtn.classList.add('playing');
+            })
+            .catch(error => {
+                console.log("No se pudo reproducir audio automáticamente:", error);
+                playPauseBtn.innerHTML = '▶️ Reproducir';
+            });
+        }
+      } else {
+        audio.pause();
+        playPauseBtn.innerHTML = '▶️ Reproducir';
+        playPauseBtn.classList.remove('playing');
+      }
+    }
+
+    playPauseBtn.addEventListener('click', toggleAudio);
+
+    // --- Botón de Entrada ---
+    enterBtn.addEventListener('click', () => {
+      overlay.classList.add('hidden');
+      toggleAudio();
+      startAnimations();
+    });
+
+    // --- Gestión de Temas ---
+    toggleThemeBtn.addEventListener('click', () => {
+      const currentTheme = document.body.classList.contains('theme-mi') ? 'theme-mi' : 'valentine';
+      const nextTheme = currentTheme === 'valentine' ? 'theme-mi' : 'valentine';
+      applyTheme(nextTheme);
+    });
+
+    function applyTheme(name) {
+      if (name === 'theme-mi') document.body.classList.add('theme-mi');
+      else document.body.classList.remove('theme-mi');
+      localStorage.setItem('ded_theme', name);
+    }
+
+    // --- ANIMACIÓN 1: Pequeños corazones verticales ---
+    function spawnSmallHeart() {
+      const el = document.createElement('div');
+      el.className = 'heart-small';
+      el.style.left = (Math.random() * 100) + 'vw';
+      const size = 15 + Math.random() * 25;
+      el.style.width = size + 'px';
+      el.style.height = size + 'px';
+      el.innerHTML = heartSVG;
+      heartsContainer.appendChild(el);
+      
+      const duration = 6000 + Math.random() * 6000;
+      const animation = el.animate([
+        { transform: `translateY(0) scale(0.8) rotate(${(-20 + Math.random() * 40)}deg)`, opacity: 0 },
+        { transform: `translateY(-20vh) scale(1) rotate(${(-20 + Math.random() * 40)}deg)`, opacity: 0.8, offset: 0.2 },
+        { transform: `translateY(-120vh) scale(${1.2 + Math.random() * 0.5}) rotate(${(-40 + Math.random() * 80)}deg)`, opacity: 0 }
+      ], { duration: duration, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)' });
+
+      animation.onfinish = () => el.remove();
+    }
+
+    // --- ANIMACIÓN 2: Burbuja Gigante Horizontal ---
+    function spawnBigBubbleHeart() {
+        const el = document.createElement('div');
+        el.className = 'big-bubble-heart';
+        
+        // Tamaño considerablemente grande
+        const size = 550 + Math.random() * 150; 
+        el.style.width = `${size}px`;
+        el.style.height = `${size}px`;
+        // Posición vertical aleatoria
+        el.style.top = (15 + Math.random() * 55) + 'vh';
+        el.innerHTML = heartSVG;
+        heartsContainer.appendChild(el);
+
+        // Determinar dirección
+        const startX = movingRight ? -size : window.innerWidth;
+        const endX = movingRight ? window.innerWidth : -size;
+        const rotation = -20 + Math.random() * 40;
+
+        // Movimiento lento y suave
+        const duration = 25000 + Math.random() * 5000; // 25-30 segundos
+
+        const animation = el.animate([
+            // Inicio
+            { transform: `translateX(${startX}px) rotate(${rotation}deg) scale(0.9)` },
+            // Mitad del camino (ligero bamboleo para efecto burbuja)
+            { transform: `translateX(${startX + (endX-startX)/2}px) rotate(${rotation * -0.5}deg) scale(1.05)`, offset: 0.5 },
+            // Final
+            { transform: `translateX(${endX}px) rotate(${rotation}deg) scale(0.9)` }
+        ], {
+            duration: duration,
+            easing: 'ease-in-out'
+        });
+
+        animation.onfinish = () => {
+            el.remove();
+            movingRight = !movingRight; // Cambiar dirección para la próxima
+            // Programar la siguiente burbuja después de un descanso
+            setTimeout(spawnBigBubbleHeart, 5000 + Math.random() * 15000);
+        };
+    }
+
+    function startAnimations() {
+      // Iniciar pequeños corazones
+      for(let i=0; i<12; i++) setTimeout(spawnSmallHeart, i * 200);
+      smallHeartInterval = setInterval(spawnSmallHeart, 700);
+      
+      // Iniciar burbuja gigante (esperar un poco al inicio)
+      setTimeout(spawnBigBubbleHeart, 2000);
+    }
+  </script>
+</body>
+</html>
